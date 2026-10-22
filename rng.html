@@ -6,7 +6,7 @@ https://fonts.gstatic.com
 https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dm2727 - rng</title>
+<title>Dm2727 - RNG</title>
 
 <style>
 body{
@@ -83,7 +83,7 @@ button{
 </head>
 <body>
 
-<h1>rng 1.0.2</h1>
+<h1>RNG app</h1>
 
 <div id="entries"></div>
 
@@ -114,7 +114,7 @@ function addEntry(name = "") {
 
     div.innerHTML = `
         <label>Name:</label>
-        <input class="name" placeholder="Enter name" value="${name}">
+        <input class="name" placeholder="Enter a name" value="${name}">
         <input class="odds" type="text" readonly>
         <button class="remove">X</button>
     `;
@@ -135,7 +135,7 @@ function addEntry(name = "") {
 function resetList() {
     entriesDiv.innerHTML = "";
     addEntry();
-    document.getElementById("result").textContent = "Reset complete";
+    document.getElementById("result").textContent = "Reset";
 }
 
 function roll() {
@@ -143,15 +143,15 @@ function roll() {
 
     if (items.length === 0) {
         document.getElementById("result").textContent =
-            "1+ name";
+            "Put at least one name!";
         return;
     }
 
     const winner = items[Math.floor(Math.random() * items.length)];
-    const name = winner.querySelector(".name").value.trim() || "Unnamed";
+    const name = winner.querySelector(".name").value.trim() || "null";
 
     document.getElementById("result").textContent =
-        "picked: " + name;
+        "Picked: " + name;
 }
 
 addEntry();
