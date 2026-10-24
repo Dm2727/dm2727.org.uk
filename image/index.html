@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dm2727 - Online Image Editor</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Open Sans',sans-serif;
+}
+
+body{
+background:#1e1e1e;
+color:white;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+.toolbar{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+padding:15px;
+background:#2b2b2b;
+border-bottom:1px solid #444;
+}
+
+.toolbar button,
+.toolbar select,
+.toolbar input{
+padding:8px;
+border:none;
+border-radius:6px;
+}
+
+button{
+cursor:pointer;
+background:#3d7eff;
+color:white;
+}
+
+button:hover{
+background:#2563eb;
+}
+
+canvas{
+background:white;
+display:block;
+margin:auto;
+cursor:crosshair;
+}
+
+.canvas-container{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:auto;
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+
+<input type="file" id="imageUpload" accept="image/*">
+
+<input type="color" id="color" value="#ff0000">
+
+<input
+type="range"
+id="brushSize"
+min="1"
+max="50"
+value="5">
+
+<button id="drawBtn">Draw</button>
+<button id="eraseBtn">Erase</button>
+
+<input
+type="text"
+id="textInput"
+placeholder="Enter text">
+
+<select id="fontSelect">
+<option>Open Sans</option>
+<option>Arial</option>
+<option>Verdana</option>
+<option>Georgia</option>
+<option>Courier New</option>
+<option>Roboto</option>
+</select>
+
+<input
+type="number"
+id="fontSize"
+value="40"
+min="10"
+max="300">
+
+<input
+type="file"
+id="fontUpload"
+accept=".ttf,.otf">
+
+<button id="textBtn">Add Text</button>
+
+<button id="undoBtn">Undo</button>
+<button id="clearBtn">Clear</button>
+<button id="saveBtn">Save PNG</button>
+
+</div>
+
+<div class="canvas-container">
+<canvas id="canvas" width="1000" height="600"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+let mode = "draw";
+
+let history = [];
+
+function saveState(){
+history.push(canvas.toDataURL());
+
+if(history.length > 30){
+history.shift();
+}
+}
+
+saveState();
+
+document
+.getElementById("drawBtn")
+.onclick = () => mode="draw";
+
+document
+.getElementById("eraseBtn")
+.onclick = () => mode="erase";
+
+canvas.addEventListener("mousedown",()=>{
+drawing=true;
+saveState();
+});
+
+canvas.addEventListener("mouseup",()=>{
+drawing=false;
+ctx.beginPath();
+});
+
+canvas.addEventListener("mousemove",draw);
+
+function draw(e){
+
+if(!drawing) return;
+
+ctx.lineWidth=
+document.getElementById("brushSize").value;
+
+ctx.lineCap="round";
+
+if(mode==="erase"){
+ctx.strokeStyle="white";
+}else{
+ctx.strokeStyle=
+document.getElementById("color").value;
+}
+
+ctx.lineTo(e.offsetX,e.offsetY);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(e.offsetX,e.offsetY);
+}
+
+document
+.getElementById("imageUpload")
+.addEventListener("change",(e)=>{
+
+const file = e.target.files[0];
+
+if(!file) return;
+
+const img = new Image();
+
+img.onload=()=>{
+
+canvas.width=img.width;
+canvas.height=img.height;
+
+ctx.drawImage(
+img,
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+saveState();
+};
+
+img.src=
+URL.createObjectURL(file);
+});
+
+document
+.getElementById("fontUpload")
+.addEventListener("change",
+async e=>{
+
+const file=e.target.files[0];
+if(!file) return;
+
+const fontName =
+file.name.split(".")[0];
+
+const font =
+new FontFace(
+fontName,
+`url(${URL.createObjectURL(file)})`
+);
+
+await font.load();
+
+document.fonts.add(font);
+
+const option =
+document.createElement("option");
+
+option.textContent=fontName;
+
+document
+.getElementById("fontSelect")
+.appendChild(option);
+
+alert("Font loaded!");
+});
+
+document
+.getElementById("textBtn")
+.onclick=()=>{
+
+const text=
+document.getElementById("textInput").value;
+
+if(!text) return;
+
+alert("Click canvas to place text");
+
+canvas.onclick=(e)=>{
+
+saveState();
+
+const font=
+document.getElementById("fontSelect").value;
+
+const size=
+document.getElementById("fontSize").value;
+
+const color=
+document.getElementById("color").value;
+
+ctx.font=
+`${size}px "${font}"`;
+
+ctx.fillStyle=color;
+
+ctx.fillText(
+text,
+e.offsetX,
+e.offsetY
+);
+
+canvas.onclick=null;
+};
+};
+
+document
+.getElementById("undoBtn")
+.onclick=()=>{
+
+if(history.length<2) return;
+
+history.pop();
+
+let img=new Image();
+
+img.onload=()=>{
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.drawImage(img,0,0);
+};
+
+img.src=
+history[history.length-1];
+};
+
+document
+.getElementById("clearBtn")
+.onclick=()=>{
+
+saveState();
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+};
+
+document
+.getElementById("saveBtn")
+.onclick=()=>{
+
+const link=
+document.createElement("a");
+
+link.download=
+"edited-image.png";
+
+link.href=
+canvas.toDataURL("image/png");
+
+link.click();
+};
+</script>
+
+</body>
+  <footer>
+   <p>©Dm2727 2026
+   All rights reserved</p>
+  </footer>
+</html>
