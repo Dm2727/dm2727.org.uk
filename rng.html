@@ -2,164 +2,346 @@
 <html lang="en">
 <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dm2727 - RNG</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-body{
-    font-family:Open Sans,sans-serif;
-    background:#1a1a1a;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dm2727 - RNG</title>
 
-h1{
-    color:#00ccff;
-}
-
-#entries{
-    max-width:700px;
-    margin:20px auto;
-}
-
-.entry{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    margin:10px 0;
-}
-
-.name,.odds{
-    padding:8px;
-    border:none;
-    border-radius:5px;
-}
-
-.name{
-    width:250px;
-}
-
-.odds{
-    width:90px;
-    text-align:center;
-    background:#ddd;
-}
-
-button{
-    padding:10px 15px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    color:white;
-}
-
-.add{
-    background:#28a745;
-}
-
-.roll{
-    background:#007bff;
-}
-
-.reset{
-    background:#ff9800;
-}
-
-.remove{
-    background:#dc3545;
-}
-
-#result{
-    margin-top:25px;
-    font-size:28px;
-    color:gold;
-    font-weight:bold;
-}
-</style>
-</head>
-<body>
-
-<h1>RNG app</h1>
-
-<div id="entries"></div>
-
-<button class="add" onclick="addEntry()">Add Name</button>
-<button class="roll" onclick="roll()">Pick Random</button>
-<button class="reset" onclick="resetList()">Reset</button>
-
-<div id="result">unpicked</div>
-
-<script>
-const entriesDiv = document.getElementById("entries");
-
-function updateOdds() {
-    const entries = document.querySelectorAll(".entry");
-
-    if (entries.length === 0) return;
-
-    const chance = (100 / entries.length).toFixed(2);
-
-    entries.forEach(entry => {
-        entry.querySelector(".odds").value = chance + "%";
-    });
-}
-
-function addEntry(name = "") {
-    const div = document.createElement("div");
-    div.className = "entry";
-
-    div.innerHTML = `
-        <label>Name:</label>
-        <input class="name" placeholder="Enter a name" value="${name}">
-        <input class="odds" type="text" readonly>
-        <button class="remove">X</button>
-    `;
-
-    div.querySelector(".remove").onclick = () => {
-        div.remove();
-        updateOdds();
-
-        if (document.querySelectorAll(".entry").length === 0) {
-            document.getElementById("result").textContent = "No names added";
-        }
-    };
-
-    entriesDiv.appendChild(div);
-    updateOdds();
-}
-
-function resetList() {
-    entriesDiv.innerHTML = "";
-    addEntry();
-    document.getElementById("result").textContent = "Reset";
-}
-
-function roll() {
-    const items = [...document.querySelectorAll(".entry")];
-
-    if (items.length === 0) {
-        document.getElementById("result").textContent =
-            "Put at least one name!";
-        return;
+    <style>
+    body{
+        font-family:Open Sans,sans-serif;
+        background:#1a1a1a;
+        color:white;
+        text-align:center;
+        padding:20px;
     }
 
-    const winner = items[Math.floor(Math.random() * items.length)];
-    const name = winner.querySelector(".name").value.trim() || "null";
+    h1,h2{
+        color:#00ccff;
+    }
 
-    document.getElementById("result").textContent =
-        "Picked: " + name;
-}
+    #entries{
+        max-width:700px;
+        margin:20px auto;
+    }
 
-addEntry();
-</script>
+    .entry{
+        display:flex;
+        justify-content:center;
+        gap:10px;
+        margin:10px 0;
+        flex-wrap:wrap;
+    }
 
-</body>
+    .name,.odds{
+        padding:8px;
+        border:none;
+        border-radius:5px;
+    }
+
+    .name{
+        width:250px;
+    }
+
+    .odds{
+        width:90px;
+        text-align:center;
+        background:#ddd;
+    }
+
+    button{
+        padding:10px 15px;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        color:white;
+        margin:5px;
+    }
+
+    .add{
+        background:#28a745;
+    }
+
+    .roll{
+        background:#007bff;
+    }
+
+    .reset{
+        background:#ff9800;
+    }
+
+    .remove{
+        background:#dc3545;
+    }
+
+    .copy{
+        background:#6f42c1;
+    }
+
+    #result{
+        margin-top:25px;
+        font-size:28px;
+        color:gold;
+        font-weight:bold;
+    }
+
+    hr{
+        margin:40px auto;
+        max-width:800px;
+        border:1px solid #444;
+    }
+
+    #passwordGenerator{
+        max-width:600px;
+        margin:0 auto;
+    }
+
+    .password-options{
+        margin:20px 0;
+    }
+
+    .password-options label{
+        display:block;
+        margin:10px 0;
+    }
+
+    #passLength{
+        width:80px;
+        padding:8px;
+        border:none;
+        border-radius:5px;
+        text-align:center;
+    }
+
+    #passwordResult{
+        margin-top:20px;
+        padding:15px;
+        background:#2a2a2a;
+        border-radius:10px;
+        font-size:22px;
+        color:lime;
+        font-weight:bold;
+        word-break:break-all;
+        min-height:30px;
+    }
+
+    footer{
+        margin-top:50px;
+        color:#aaa;
+    }
+    </style>
+</head>
+
+<body>
+
+    <h1>RNG App 2.0</h1>
+
+    <div id="entries"></div>
+
+    <button class="add" onclick="addEntry()">Add Name</button>
+    <button class="roll" onclick="roll()">Pick Random</button>
+    <button class="reset" onclick="resetList()">Reset</button>
+
+    <div id="result">Unpicked</div>
+
+    <hr>
+
+    <h2>Password Generator</h2>
+
+    <div id="passwordGenerator">
+
+        <p>
+            Password Length:
+            <input type="number" id="passLength" min="4" max="100" value="12">
+        </p>
+
+        <div class="password-options">
+
+            <label>
+                <input type="checkbox" id="useUpper" checked>
+                Uppercase Letters (A-Z)
+            </label>
+
+            <label>
+                <input type="checkbox" id="useLower" checked>
+                Lowercase Letters (a-z)
+            </label>
+
+            <label>
+                <input type="checkbox" id="useSymbols" checked>
+                Symbols (!@#$%^&*)
+            </label>
+            
+            <label>
+                <input type="checkbox" id="useNumbers" checked>
+                Numbers (0-9)
+            </label>
+            
+
+        </div>
+
+        <button class="roll" onclick="generatePassword()">
+            Generate Password
+        </button>
+
+        <button class="copy" onclick="copyPassword()">
+            Copy Password
+        </button>
+
+        <div id="passwordResult">
+            No password generated
+        </div>
+
+    </div>
+
+    <script>
+    const entriesDiv = document.getElementById("entries");
+
+    function updateOdds() {
+        const entries = document.querySelectorAll(".entry");
+
+        if (entries.length === 0) return;
+
+        const chance = (100 / entries.length).toFixed(2);
+
+        entries.forEach(entry => {
+            entry.querySelector(".odds").value = chance + "%";
+        });
+    }
+
+    function addEntry(name = "") {
+        const div = document.createElement("div");
+        div.className = "entry";
+
+        div.innerHTML = `
+            <label>Name:</label>
+            <input class="name" placeholder="Enter a name" value="${name}">
+            <input class="odds" type="text" readonly>
+            <button class="remove">X</button>
+        `;
+
+        div.querySelector(".remove").onclick = () => {
+            div.remove();
+            updateOdds();
+
+            if (document.querySelectorAll(".entry").length === 0) {
+                document.getElementById("result").textContent =
+                    "No names added";
+            }
+        };
+
+        entriesDiv.appendChild(div);
+        updateOdds();
+    }
+
+    function resetList() {
+        entriesDiv.innerHTML = "";
+        addEntry();
+        document.getElementById("result").textContent = "Reset";
+    }
+
+    function roll() {
+        const items = [...document.querySelectorAll(".entry")];
+
+        if (items.length === 0) {
+            document.getElementById("result").textContent =
+                "Add at least one name";
+            return;
+        }
+
+        const winner =
+            items[Math.floor(Math.random() * items.length)];
+
+        const name =
+            winner.querySelector(".name").value.trim() || "null";
+
+        document.getElementById("result").textContent =
+            "Picked: " + name;
+    }
+
+    function generatePassword() {
+
+        const length =
+            parseInt(document.getElementById("passLength").value);
+
+        const upper =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        const lower =
+            "abcdefghijklmnopqrstuvwxyz";
+
+        const symbols =
+            "!@#$%^&*()_+-=[]{}|;:,.<>?";
+            
+        const numbers =
+            "0123456789";
+            
+        let chars = "";
+
+        if (document.getElementById("useUpper").checked) {
+            chars += upper;
+        }
+
+        if (document.getElementById("useLower").checked) {
+            chars += lower;
+        }
+
+        if (document.getElementById("useSymbols").checked) {
+            chars += symbols;
+        }
+        
+        if (document.getElementById("useNumbers").checked) {
+            chars += numbers;
+        }
+        
+        if (chars.length === 0) {
+            document.getElementById("passwordResult").textContent =
+                "Select at least one option";
+            return;
+        }
+
+        let password = "";
+
+        for (let i = 0; i < length; i++) {
+            password +=
+                chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        document.getElementById("passwordResult").textContent =
+            password;
+    }
+
+    function copyPassword() {
+
+        const password =
+            document.getElementById("passwordResult").textContent;
+
+        if (
+            password === "No password" ||
+            password === "Select at least one option"
+        ) {
+            alert("Generate a password first");
+            return;
+        }
+
+        navigator.clipboard.writeText(password)
+            .then(() => {
+                alert("Password copied");
+            })
+            .catch(() => {
+                alert("Failed to copy password");
+            });
+    }
+
+    addEntry();
+    </script>
+    
+    </body>
     <footer>
-   <p>©Dm2727 2026
-   All rights reserved</p>
+        <p>©Dm2727 2026
+            All rights reserved
+        </p>
     </footer>
 </html>
